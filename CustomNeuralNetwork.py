@@ -1,10 +1,13 @@
+import numpy as np
+from data_processor import data, X, y
+
 class Layer():
 
   def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
-  def init(self, activationFunction = sigmoid, dim=[0,0]):
-    self.weights = np.random(dim)
+  def __init__(self, activationFunction = sigmoid, dim=[0,0]):
+    self.weights = np.random.random(dim)
     self.act = np.vectorize(activationFunction)
 
   def apply(self, x):
@@ -16,17 +19,14 @@ class Layer():
     else:
       return x.dot(y)
 
+  # def update(self):
+  #   self.weights += 
 
-  def update(self):
-    self.weights += 
-
-
-
+  def activate():
+    
 
 
 class NeuralNetwork():
-  
-  
 
   def __init__(self, alpha=1E-5, weights=[], w_0=0.0, decay_rate=-1):
     self.alpha = alpha
@@ -37,9 +37,14 @@ class NeuralNetwork():
   def predict_regression(self, samples):
     return np.dot(samples, self.weights) + self.w_0
 
-  def train_regression(self, samples, solutions, max_loops=50000):
+  def create_layers(self):
+    layers = []
+    for _ in range(3):
+      layers.append(Layer(dim=[3, 1]))
+    return layers
 
-    
+  def train_regression(self, samples, solutions, max_loops=50000):
+    layers = self.create_layers()
         
     X = np.array([[0,0,1],
                 [0,1,1],
@@ -57,7 +62,7 @@ class NeuralNetwork():
     syn0 = 2*np.random.random((3,4)) - 1
     syn1 = 2*np.random.random((4,1)) - 1
 
-    for j in xrange(60000):
+    for j in range(60000):
 
       previousOutput = X
       outputs = []
@@ -118,7 +123,7 @@ class NeuralNetwork():
       err /= len(samples)
       output.append(err)
       
-      print "i=", i, ", err=", err#, ", v_err=", v_err
+      print("i=", i, ", err=", err)#, ", v_err=", v_err
         
     return output
         
@@ -138,3 +143,7 @@ def shuffle_lists(a, b):
     _b.append(b[i])
     
   return _a, _b
+
+
+nn = NeuralNetwork()
+nn.train_regression(samples=X, solutions=y)

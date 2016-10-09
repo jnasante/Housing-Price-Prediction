@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-import data_processor as data
+from data_processor import data, X, y
 
 sess = tf.InteractiveSession()
 

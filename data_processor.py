@@ -9,9 +9,15 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 pd.options.mode.chained_assignment = None  # default='warn'
 
 # data dictionary to hold all the values we read in, drop month and day
-data = pd.read_csv('kc_house_data.csv')
+data_full = pd.read_csv('kc_house_data.csv')
+data = data_full.drop(['id'], axis=1)
 
-print(data.shape[0])
+# X and y for our learning (as matrices)
+X = data.as_matrix(columns=data.columns[1:])
+y = data['price'].values
+
+
+# print(data.shape[0])
 
 
 
