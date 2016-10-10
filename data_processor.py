@@ -4,6 +4,7 @@ import matplotlib.pyplot as plot
 import matplotlib.legend_handler as legend_handler
 import pandas as pd
 import numpy as np
+from sklearn.cross_validation import train_test_split
 
 
 
@@ -20,8 +21,11 @@ data = data_full.drop(['id'], axis=1)
 X = data.as_matrix(columns=data.columns[1:])
 y = data['price'].values
 
+def cross_validation():
+	X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+	X_val, X_test, y_val, y_test = train_test_split(X_val, y_val, test_size=0.5, random_state=42)
 
-# print(data.shape[0])
+	return X_train, y_train, X_val, y_val, X_test, y_test
 
 
 

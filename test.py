@@ -1,5 +1,3 @@
-from data_processor import data_full, data, X, y
+from data_processor import data_full, data, X, y, cross_validation
 
-print(data_full.shape[1])
-print(X)
-print(y)
+print(cross_validation())
