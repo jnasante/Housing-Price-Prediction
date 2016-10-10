@@ -19,8 +19,8 @@ data = data_full.drop(['id'], axis=1)
 X = data.as_matrix(columns=data.columns[1:])
 y = data['price'].values
 
-def cross_validation():
-	X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+def cross_validation(_x=X, _y=y):
+	X_train, X_val, y_train, y_val = train_test_split(_x, _y, test_size=0.2, random_state=42)
 	X_val, X_test, y_val, y_test = train_test_split(X_val, y_val, test_size=0.5, random_state=42)
 
 	return X_train, y_train, X_val, y_val, X_test, y_test

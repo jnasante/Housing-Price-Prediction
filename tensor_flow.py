@@ -8,17 +8,17 @@ sess = tf.InteractiveSession()
 # We will change this based on our actual needs.
 
 # a batch of inputs of 2 value each
-inputs = tf.placeholder(tf.float32, shape=[None, 2])
+inputs = tf.placeholder(tf.float32, shape=[1, 18])
 
 # a batch of output of 1 value each
-desired_outputs = tf.placeholder(tf.float32, shape=[None, 1])
+desired_outputs = tf.placeholder(tf.float32, shape=[1, 1])
 
 # [!] define the number of hidden units in the first layer
 HIDDEN_UNITS = 4 
 
 # connect 2 inputs to 3 hidden units
 # [!] Initialize weights with random numbers, to make the network learn
-weights_1 = tf.Variable(tf.truncated_normal([2, HIDDEN_UNITS]))
+weights_1 = tf.Variable(tf.truncated_normal([18, HIDDEN_UNITS]))
 
 # [!] The biases are single values per hidden unit
 biases_1 = tf.Variable(tf.zeros([HIDDEN_UNITS]))
@@ -32,16 +32,16 @@ layer_1_outputs = tf.nn.sigmoid(tf.matmul(inputs, weights_1) + biases_1)
 # [!] Lets' add a new layer and change the layer 2 to output more than 1 value
 
 # connect first hidden units to 2 hidden units in the second hidden layer
-weights_2 = tf.Variable(tf.truncated_normal([HIDDEN_UNITS, 2]))
+weights_2 = tf.Variable(tf.truncated_normal([HIDDEN_UNITS, 18]))
 # [!] The same of above
-biases_2 = tf.Variable(tf.zeros([2]))
+biases_2 = tf.Variable(tf.zeros([18]))
 
 # connect the hidden units to the second hidden layer
 layer_2_outputs = tf.nn.sigmoid(
     tf.matmul(layer_1_outputs, weights_2) + biases_2)
 
 # [!] create the new layer
-weights_3 = tf.Variable(tf.truncated_normal([2, 1]))
+weights_3 = tf.Variable(tf.truncated_normal([18, 1]))
 biases_3 = tf.Variable(tf.zeros([1]))
 
 logits = tf.nn.sigmoid(tf.matmul(layer_2_outputs, weights_3) + biases_3)
@@ -53,14 +53,14 @@ train_step = tf.train.GradientDescentOptimizer(0.05).minimize(error_function)
 
 sess.run(tf.initialize_all_variables())
 
-training_inputs = [[0.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 1.0]]
+training_inputs = X
 
-training_outputs = [[0.0], [1.0], [1.0], [0.0]]
+training_outputs = y
 
 for i in range(1000):
     _, loss = sess.run([train_step, error_function],
-                       feed_dict={inputs: np.array(training_inputs),
-                                  desired_outputs: np.array(training_outputs)})
+                       feed_dict={inputs: training_inputs,
+                                  desired_outputs: training_outputs})
     #print(loss)
 
 print(sess.run(logits, feed_dict={inputs: np.array([[0.0, 0.0]])}))
