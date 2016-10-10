@@ -1,7 +1,11 @@
+import matplotlib 
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plot
 import matplotlib.legend_handler as legend_handler
 import pandas as pd
 import numpy as np
+
+
 
 # Suppress warnings we want to ignore
 import warnings
