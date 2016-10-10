@@ -4,7 +4,7 @@ import math
 from random import shuffle
 
 def sigmoid(x):
-  return 1 / (1 + np.exp(-x))
+  return 
 
 def sigmoidPrime(x):
   return x * (1 - x)
@@ -31,41 +31,49 @@ class NeuralNetwork():
   def predict_regression(self, samples):
     return np.dot(samples, self.weights) + self.w_0
 
-  def train_regression(self, samples, solutions, max_loops=50000, alpha=0.01):
+  def train_regression(self, samples, solutions, max_loops=5000, alpha=0.001):
     hidden_layer_size = 18
     feature_count = 18
     output_layer_size = 1
 
     np.random.seed(10)
 
-    weights0 = 2.0 * np.random.random( (feature_count,hidden_layer_size) ) - 1.0 
+    weights0 = 2.0 * np.random.random( (feature_count, hidden_layer_size) ) - 1.0 
     weights1 = 2.0 * np.random.random( (hidden_layer_size, output_layer_size) ) - 1.0 
 
     currentError = 100.0
-    numSamples = len(y)
+    
+    _y = np.array([y]).T
 
+
+    prevWeights0 = weights0
+    prevWeights1 = weights1
     for j in range(max_loops):
-      if (j % 1000) == 0:
+      #print(weights0)
+      #_X, _y = shuffle_lists(X, y)
+
+      output1 = 1 / (1 + np.exp(-1.0 * np.dot(X, weights0)))
+      output2 = 1 / (1 + np.exp(-1.0 * np.dot(output1, weights1)))
+
+      currentError = math.sqrt(np.sum(np.square(output2 - _y)))
+      if (j % 100) == 0:
         print("At iteration %d, error : %f" % (j, math.sqrt(currentError)))
 
-      currentError = 0.0
-      _X, _y = shuffle_lists(X, y)
-      for x, label in zip(_X, _y):
+      #currentError += ((y - output1) ** 2)
 
-        output0 = sigmoid(weights0.dot(x))
-        output1 = sigmoid(output0.dot(weights1))
+      delta2 = (output2 - _y) * sigmoidPrime(output2)
+      delta1 = delta2.dot(weights1.T) * sigmoidPrime(output1)
 
-        currentError += ((label - output1) ** 2)
+      weights1 = weights1 - alpha * np.dot(output1.T, delta2)
 
-        delta1 = (label - output1) * sigmoidPrime(output1)
-        delta0 = delta1.dot(weights1.T) * sigmoidPrime(output0)
+      #print(np.sum(weights1 - prevWeights1))
 
-        weights1 += (alpha * output0.T.dot(delta1))
-        weights0 += (alpha * x.T.dot(delta0))
+      weights0 = weights0 + alpha * X.T.dot(delta1)
 
+      #print(np.sum(weights0 - prevWeights0))
 
-
-
+      #prevWeights0 = weights0
+      #prevWeights1 = weights1
 
 
 nn = NeuralNetwork()
