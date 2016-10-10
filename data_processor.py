@@ -6,12 +6,10 @@ import pandas as pd
 import numpy as np
 from sklearn.cross_validation import train_test_split
 
-
-
 # Suppress warnings we want to ignore
-import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-pd.options.mode.chained_assignment = None  # default='warn'
+# import warnings
+# warnings.filterwarnings("ignore", category=DeprecationWarning)
+# pd.options.mode.chained_assignment = None  # default='warn'
 
 # data dictionary to hold all the values we read in, drop month and day
 data_full = pd.read_csv('kc_house_data.csv')
