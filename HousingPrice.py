@@ -8,6 +8,9 @@ def featureScale(x):
   devs = np.std(x, axis=0)
   return np.array((x - means) / devs)	
 
+def invertScale(arr):
+	return np.multiply(arr)
+
 # Prepare the data
 scaledX, scaledY = featureScale(X), featureScale(y)
 X_train, y_train, X_val, y_val, X_test, y_test = cross_validation(scaledX, scaledY)
@@ -23,7 +26,7 @@ def get_neural_network(retrain=False):
 def predict_price(test_subject, nn):
 
 	# K-Nearest Neighbors
-	neighbors = get_neighbors(X_train, test_subject, 3)
+	neighbors = get_neighbors(X_test, test_subject, 3)
 
 	# Combine forces
 	predictions_sum = 0.0
@@ -56,8 +59,14 @@ def compare_knn():
 # price = predict_price(X_test[0], get_neural_network())
 # print(price)
 
+test_subject = 200
 nn = get_neural_network()
-print(nn.test(X_test))
-print(nn.predict(X_test[0]))
+n = nn.predict(X_test[test_subject])
+p = predict_price(X_test[test_subject], nn)
+print(p)
+print(n)
+print(y_test[test_subject])
+# print(nn.batch_predict(X_test))
+# print()
 
-# compare_knn()
+compare_knn()
