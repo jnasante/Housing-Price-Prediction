@@ -1,19 +1,10 @@
-from data_processor import X, y, cross_validation
+from data_processor import X, y, cross_validation, invertScale
 from CustomNeuralNetwork import NeuralNetwork
 import numpy as np
 from knn import get_neighbors
 
-def featureScale(x):
-  means = np.mean(x, axis=0)
-  devs = np.std(x, axis=0)
-  return np.array((x - means) / devs)	
-
-def invertScale(arr):
-	return np.multiply(arr)
-
 # Prepare the data
-scaledX, scaledY = featureScale(X), featureScale(y)
-X_train, y_train, X_val, y_val, X_test, y_test = cross_validation(scaledX, scaledY)
+X_train, y_train, X_val, y_val, X_test, y_test = cross_validation()
 
 def get_neural_network(retrain=False):
 	# Neural Network
@@ -59,14 +50,14 @@ def compare_knn():
 # price = predict_price(X_test[0], get_neural_network())
 # print(price)
 
-test_subject = 200
+test_subject = 0
 nn = get_neural_network()
 n = nn.predict(X_test[test_subject])
 p = predict_price(X_test[test_subject], nn)
-print(p)
-print(n)
-print(y_test[test_subject])
+print(invertScale(n))
+print(invertScale(p))
+print(invertScale(y_test[test_subject]))
 # print(nn.batch_predict(X_test))
 # print()
 
-compare_knn()
+# compare_knn()
