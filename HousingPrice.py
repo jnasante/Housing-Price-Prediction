@@ -37,10 +37,11 @@ def compare_knn():
 
 	testErrors = []
 	for i in range(len(X_test)):
-		if (i % 100 == 0):
-			print('Iteration: {0}'.format(i))
 		price = predict_price(X_test[i], nn)
-		testErrors.append((price-y_test[i])**2)
+		sse = (price-y_test[i])**2
+		testErrors.append(sse)
+		if (i % 100 == 0):
+			print('Iteration: {0}\tSSE: {1}'.format(i, sse))
 	error = np.sum(testErrors)
 
 	print('Test Error: {0}'.format(error))
@@ -50,14 +51,12 @@ def compare_knn():
 # price = predict_price(X_test[0], get_neural_network())
 # print(price)
 
-test_subject = 0
+test_subject = 50
 nn = get_neural_network()
 n = nn.predict(X_test[test_subject])
-p = predict_price(X_test[test_subject], nn)
-print(invertScale(n))
-print(invertScale(p))
-print(invertScale(y_test[test_subject]))
-# print(nn.batch_predict(X_test))
-# print()
+k = predict_price(X_test[test_subject], nn)
+print('Neural Net: {0}'.format(invertScale(n)))
+print('With KNN: {0}'.format(invertScale(k)))
+print('Actual Price: {0}:'.format(invertScale(y_test[test_subject])))
 
 # compare_knn()

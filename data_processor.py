@@ -17,11 +17,12 @@ devs = []
 def featureScale(x):
 	global means
 	global devs
-	means = np.mean(x, axis=0)
-	devs = np.std(x, axis=0)
+	means = np.mean(x)
+	devs = np.std(x)
 	return np.array((x - means) / devs)
 
 def invertScale(val):
+	# print(means, devs)
 	return val * devs + means
 
 # data dictionary to hold all the values we read in, drop month and day
