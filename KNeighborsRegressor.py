@@ -99,13 +99,16 @@ def print_results():
 
 def graph_results():
 	# Graph everything
-	fig, axes = plot.subplots(nrows=2, ncols=1, sharey=False, sharex=False)
+	fig, axes = plot.subplots(nrows=3, ncols=1, sharey=False, sharex=False)
 
 	axes[0].plot(range(1, len(training_error)+1), training_error)
 	axes[0].set_title("Mean Squared Error (Training)")
 
-	axes[1].plot(range(1, len(testing_error)+1), validation_error)
+	axes[1].plot(range(1, len(validation_error)+1), validation_error)
 	axes[1].set_title("Mean Squared Error (Validation)")
+
+	axes[2].plot(range(1, len(testing_error)+1), testing_error)
+	axes[2].set_title("Mean Squared Error (Testing)")
 
 	plot.show()
 
