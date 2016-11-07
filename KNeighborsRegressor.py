@@ -10,7 +10,7 @@ from sklearn.metrics import mean_squared_error
 
 # Other constants
 # ks = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 ]
-ks = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+ks = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ]
 bestModel, bestError = 0, 0.0
 
 # Error for all splits
@@ -66,7 +66,7 @@ def findBestModel():
 
 def learn():
 	for m in range(len(ks)):
-		print('learning for k={0}'.format(ks[m]))
+		print('Learning for k={0}'.format(ks[m]))
 		training_total = 0
 		validation_total = 0
 		testing_total = 0
@@ -119,7 +119,7 @@ def train_model():
 
 def predict():
 	prediction = splits[0].models[bestModel].predict(splits[0].X_testing[0].reshape(1, -1))
-	print('Prediction: {0}\tActual: {1}'.format(prediction[0], splits[0].y_testing[0]))
+	print('Prediction: ${0}\tActual: ${1}'.format(round(prediction[0], 2), round(splits[0].y_testing[0], 2)))
 
 
 train_model()
