@@ -16,15 +16,18 @@ def get_neural_network(retrain=False):
 
 def predict_price(test_subject, nn):
 	# K-Nearest Neighbors
-	neighbors = get_neighbors(X_test, test_subject, 3)
+	neighbors = get_neighbors(X_test, test_subject, k=10)
 
 	# Combine forces
 	predictions_sum = 0.0
+	knn_predictions_sum = 0.0
 	for neighbor in neighbors:
-		predictions_sum += nn.predict(neighbor)
-	price = predictions_sum/len(neighbors)
+		predictions_sum += nn.predict(neighbor[0])
+		knn_predictions_sum += y_test[neighbor[1]]
+	price_combine = predictions_sum/len(neighbors)
+	price_knn = knn_predictions_sum/len(neighbors)
 
-	return price
+	return price_combine, price_knn
 
 	# print('Neural Network Prediction: {0}'.format(nn.predict(test_subject)))
 	# print('KNN Prediction: {0}'.format(price))
@@ -34,11 +37,12 @@ def square_diff(true, pred):
 	return (true-pred)**2
 
 def compare_knn(test_set=X_test):
-	print('Comparing error of NN with/without KNN')
+	print('Comparing error of NN, KNN, & combined')
 	nn = get_neural_network()
 
 	knnErrors = []
 	nnErrors = []
+	errors = []
 	for i in range(len(test_set)):
 		if (i % 100 == 0):
 			print('Iteration: {0}\tProgress: {1}%'.format(i, int(100*i/len(test_set))))
@@ -48,15 +52,18 @@ def compare_knn(test_set=X_test):
 		err = invertScale(square_diff(price, y_test[i]))
 		nnErrors.append(err)
 
-		# Neural Net clothed with KNN
-		price = predict_price(X_test[i], nn)
+		# Neural Net clothed with KNN / Bare KNN
+		price, knn_price = predict_price(X_test[i], nn)
 		err = invertScale(square_diff(price, y_test[i]))
-		knnErrors.append(err)
+		errors.append(err)
+		knn_err = invertScale(square_diff(knn_price, y_test[i]))
+		knnErrors.append(knn_err)
 
 	knnError = np.mean(knnErrors)
 	nnError = np.mean(nnErrors)
+	error = np.mean(errors)
 
-	print('NN MSE: {0}\tKNN MSE:{1}'.format(nnError, knnError))
+	print('NN MSE: {0}\tKNN MSE:{1}\ttogether:{2}'.format(nnError, knnError, error))
 
 def test_sample():
 	test_subject = 50
@@ -64,7 +71,8 @@ def test_sample():
 	n = nn.predict(X_test[test_subject])
 	k = predict_price(X_test[test_subject], nn)
 	print('Neural Net: {0}, {1}'.format(n, invertScale(n)))
-	print('With KNN: {0}, {1}'.format(k, invertScale(k)))
+	print('KNN: {0}, {1}'.format(k[1], invertScale(k[1])))
+	print('Combined: {0}, {1}'.format(k[0], invertScale(k[0])))
 	print('Actual Price: {0}, {1}:'.format(y_test[test_subject], invertScale(y_test[test_subject])))
 
 

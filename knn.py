@@ -11,13 +11,12 @@ def get_neighbors(neighborhood, house, k):
 	distances = []
 	for i in range(len(neighborhood)):
 		distance = euclidean_distance(house, neighborhood[i])
-		distances.append((neighborhood[i], distance))
+		distances.append((neighborhood[i], i, distance))
 
-	distances.sort(key=operator.itemgetter(1))
+	distances.sort(key=operator.itemgetter(2))
 
 	neighbors = []
 	for i in range(k):
-		neighbors.append(distances[i][0])
+		neighbors.append(distances[i])
 		
 	return neighbors
-
