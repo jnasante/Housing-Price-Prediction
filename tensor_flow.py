@@ -8,10 +8,10 @@ sess = tf.InteractiveSession()
 # We will change this based on our actual needs.
 
 # a batch of inputs of 2 value each
-inputs = tf.placeholder(tf.float32, shape=[1, 18])
+inputs = tf.placeholder(tf.float32)
 
 # a batch of output of 1 value each
-desired_outputs = tf.placeholder(tf.float32, shape=[1, 1])
+desired_outputs = tf.placeholder(tf.float32)
 
 # [!] define the number of hidden units in the first layer
 HIDDEN_UNITS = 4 
@@ -49,7 +49,7 @@ logits = tf.nn.sigmoid(tf.matmul(layer_2_outputs, weights_3) + biases_3)
 # [!] The error function chosen is good for a multiclass classification taks, not for a XOR.
 error_function = 0.5 * tf.reduce_sum(tf.sub(logits, desired_outputs) * tf.sub(logits, desired_outputs))
 
-train_step = tf.train.GradientDescentOptimizer(0.05).minimize(error_function)
+train_step = tf.train.GradientDescentOptimizer(0.000001).minimize(error_function)
 
 sess.run(tf.initialize_all_variables())
 
@@ -61,7 +61,7 @@ for i in range(1000):
     _, loss = sess.run([train_step, error_function],
                        feed_dict={inputs: training_inputs,
                                   desired_outputs: training_outputs})
-    #print(loss)
+    print(loss)
 
 print(sess.run(logits, feed_dict={inputs: np.array([[0.0, 0.0]])}))
 print(sess.run(logits, feed_dict={inputs: np.array([[0.0, 1.0]])}))
