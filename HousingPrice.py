@@ -16,7 +16,7 @@ def get_neural_network(retrain=False):
 
 def predict_price(test_subject, nn):
 	# K-Nearest Neighbors
-	neighbors = get_neighbors(X_test, test_subject, k=10)
+	neighbors = get_neighbors(X_test, test_subject, k=10[])
 
 	# Combine forces
 	predictions_sum = 0.0
