@@ -10,7 +10,7 @@ def get_neural_network(retrain=False):
 	# Neural Network
 	nn = NeuralNetwork(feature_count=len(X[0]))
 	if (retrain):
-		nn.train_regression(X_train, y_train.T, X_val, y_val.T, X_test, y_test.T, max_loops=500, plot_results=True)
+		nn.train_regression(X_train, y_train.T, X_val, y_val.T, X_test, y_test.T, max_loops=100, plot_results=True)
 
 	return nn
 
@@ -67,7 +67,7 @@ def compare_knn(test_set=X_test):
 
 def test_sample():
 	test_subject = 50
-	nn = get_neural_network(retrain=False)
+	nn = get_neural_network(retrain=True)
 	n = nn.predict(X_test[test_subject])
 	k = predict_price(X_test[test_subject], nn)
 	print('Neural Net: {0}, {1}'.format(n, invertScale(n)))
@@ -80,4 +80,4 @@ def test_sample():
 # print(price)
 
 test_sample()
-compare_knn()
+#compare_knn()
