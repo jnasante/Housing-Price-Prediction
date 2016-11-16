@@ -3,7 +3,7 @@ import math
 from random import shuffle
 from scipy.special import expit
 from matplotlib import pyplot as plt
-
+import copy
 
 class Activation():
   @staticmethod
@@ -58,11 +58,16 @@ class NeuralNetwork():
     self.thirdway_point = int(self.hidden_layer_size / 3.0)
 
   def train_regression(self, X_train, y_train, X_val, y_val, X_test, y_test, max_loops=50, alpha=0.00001, plot_results=False, num_hidden_layers=1):
+    if (num_hidden_layers < 1):
+      return
 
+    weights = [self.initialize_weight_layer(self.feature_count, self.hidden_layer_size)]
+    for i in range(num_hidden_layers-1):
+      weights.append(self.initialize_weight_layer(self.hidden_layer_size, self.hidden_layer_size))
+    weights.append(self.initialize_weight_layer(self.hidden_layer_size, self.output_layer_size))
 
-    weights = [self.initialize_weight_layer(self.feature_count, self.hidden_layer_size), self.initialize_weight_layer(self.hidden_layer_size, self.output_layer_size)]
-    mixedWeights = np.copy(weights)
-    tripleWeights = np.copy(weights)
+    mixedWeights = copy.deepcopy(weights)
+    tripleWeights = copy.deepcopy(weights)
 
     self.trainErrors, mixedTrainErrors, tripleTrainErrors = [], [], []
     self.validationErrors, mixedValidationErrors, tripleValidationErrors = [], [], []
@@ -77,7 +82,8 @@ class NeuralNetwork():
         
         # Hidden layer after activation
         reg_input_raw, mixed_input_raw, triple_input_raw = sam, sam, sam
-        mixedActivated, tripleActivated = [], []
+        regActivated, mixedActivated, tripleActivated = [], [], []
+        reg_output_dotted, mixed_output_dotted, triple_output_dotted = [], [], []
 
         # For each hidden layer hidden (apply mixing to all layers except output)
         for l in range(num_hidden_layers):
@@ -93,7 +99,7 @@ class NeuralNetwork():
 
           reg_input_raw = regActivated[l]
           mixed_input_raw = np.append(mixedActivated[l][0], mixedActivated[l][1])
-          triple_input_raw = np.append(tripleActivated[l][0], tripleActivated[l][1], tripleActivated[l][2])
+          triple_input_raw = np.append(np.append(tripleActivated[l][0], tripleActivated[l][1]), tripleActivated[l][2])
 
         # Output Layer (needs to be sigmoid activation)
         regOutput = self.vectorizedSigmoid(np.dot(reg_input_raw, weights[-1]))
@@ -116,23 +122,23 @@ class NeuralNetwork():
 
         regDelta, mixedDelta, tripleDelta = [reg_delta_output], [mixed_delta_output], [triple_delta_output]
 
-        for l in range(num_hidden_layers, 0, -1):  
-          reg, mixed, triple = self.delta_hidden(regActivated[l-1], mixedActivated[l-1], tripleActivated[l-1], regDelta[0], mixedDelta[0], tripleDelta[0])
-          
+        for l in range(num_hidden_layers, 0, -1):
+          reg, mixed, triple = self.delta_hidden(regActivated[l-1], mixedActivated[l-1], tripleActivated[l-1], weights[l-1], mixedWeights[l-1], tripleWeights[l-1], regDelta[0], mixedDelta[0], tripleDelta[0])
+
           # Deltas
           regDelta.insert(0, reg)
           mixedDelta.insert(0, mixed)
           tripleDelta.insert(0, triple)
         
         ########################## UPDATE WEIGHTS ##########################
-        for l in range(num_hidden_layers, 0, -1):
-          weights[l] -= np.array([alpha * (reg_output_activated[l] * regDelta[l])]).T
-          mixedWeights[l] -= np.array([alpha * (mixed_output_activated[l] * mixedDelta[l])]).T
-          tripleWeights[l] -= np.array([alpha * (triple_output_activated[l] * tripleDelta[l])]).T
+        for l in range(1, num_hidden_layers+1):
+          weights[l] -= np.array([alpha * (regActivated[l] * regDelta[l])]).T
+          mixedWeights[l] -= np.array([alpha * (mixedActivated[l] * mixedDelta[l])]).T
+          tripleWeights[l] -= np.array([alpha * (tripleActivated[l] * tripleDelta[l])]).T
         
-        weights[0] -= alpha * np.dot(delta[0], sam.T)
-        mixedWeights[0] -= alpha * np.dot(mixedDelta[0], sam.T)
-        tripleWeights[0] -= alpha * np.dot(tripleDelta[0], sam.T)
+        weights[0] -= alpha * np.dot(sam.T, regDelta[0])
+        mixedWeights[0] -= alpha * np.dot(sam.T, mixedDelta[0])
+        tripleWeights[0] -= alpha * np.dot(sam.T, tripleDelta[0])
 
       ########################## CHECKPOINT (output) ##########################
       if j % 10 == 0:
@@ -161,7 +167,6 @@ class NeuralNetwork():
           valTripleLinearActivated = self.vectorizedLinear(valTripleInput0[2*self.thirdway_point:])
           valTripleOutput1 = np.append(np.append(valTripleSigmoidActivated, valTripleTanhActivated), valTripleLinearActivated)
           valtriple_output = self.vectorizedSigmoid(np.dot(valTripleOutput1, tripleWeights1))
-
 
           valError += ((_y - valregOutput) ** 2.0)
           mixedValError += ((_y - valmixed_output) ** 2.0)
@@ -219,7 +224,7 @@ class NeuralNetwork():
   def delta_output(self, error, output):
     return error * self.vectorizedSigmoidPrime(output)
 
-  def delta_hidden(self, regActivated, mixedActivated, tripleActivated, delta2, mixedDelta2, tripleDelta2):
+  def delta_hidden(self, regActivated, mixedActivated, tripleActivated, regWeights1, mixedWeights1, tripleWeights1, regDelta2, mixedDelta2, tripleDelta2):
     # Regular
     regPrime = regActivated
 
@@ -233,11 +238,12 @@ class NeuralNetwork():
     triplePrime = np.append(np.append(tripleSigmoidPrimeDelta, tripleTanhPrimeDelta), tripleLinearPrimeDelta)
 
     # Resulting deltas
-    delta1 = delta2.dot(weights1.T) * Activation.sigmoidPrime(regPrime)
+    print(len(regDelta2), len(regWeights1.T))
+    regDelta1 = regDelta2.dot(regWeights1.T) * Activation.sigmoidPrime(regPrime)
     mixedDelta1 = mixedDelta2.dot(mixedWeights1.T) * mixedPrime
     tripleDelta1 = tripleDelta2.dot(tripleWeights1.T) * triplePrime
 
-    return delta1, mixedDelta1, tripleDelta1
+    return regDelta1, mixedDelta1, tripleDelta1
 
 
   def create_graph(self, magic, errors, mixedErrors, tripleErrors, title):
