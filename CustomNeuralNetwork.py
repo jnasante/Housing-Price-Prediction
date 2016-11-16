@@ -4,23 +4,31 @@ from random import shuffle
 from scipy.special import expit
 from matplotlib import pyplot as plt
 
-def linear(x):
-  return x
 
-def sigmoid(x):
-  return 1.0 / (1.0 + np.exp(-x))
+class Activation():
+  @staticmethod
+  def linear(x):
+    return x
 
-def tanh(x):
-  return (2.0 / (1 + np.exp(-2.0 * x))) - 1.0
+  @staticmethod
+  def sigmoid(x):
+    return 1.0 / (1.0 + np.exp(-x))
 
-def sigmoidPrime(x):
-  return x * (1.0 - x)
+  @staticmethod
+  def tanh(x):
+    return (2.0 / (1 + np.exp(-2.0 * x))) - 1.0
 
-def tanhPrime(x):
-  return 1.0 - np.square(tanh(x))
+  @staticmethod
+  def sigmoidPrime(x):
+    return x * (1.0 - x)
 
-def linearPrime(x):
-  return 1
+  @staticmethod
+  def tanhPrime(x):
+    return 1.0 - np.square(Activation.tanh(x))
+
+  @staticmethod
+  def linearPrime(x):
+    return 1
 
 def shuffle_lists(a, b):
   _a = []
@@ -61,8 +69,8 @@ class NeuralNetwork():
     self.trainErrors, mixedTrainErrors, tripleTrainErrors = [], [], []
     self.validationErrors, mixedValidationErrors, tripleValidationErrors = [], [], []
 
-    vectorizedSigmoid, vectorizedTanh, vectorizedLinear = np.vectorize(sigmoid), np.vectorize(tanh), np.vectorize(linear)
-    vectorizedSigmoidPrime, vectorizedTanhPrime, vectorizedLinearPrime = np.vectorize(sigmoidPrime), np.vectorize(tanhPrime), np.vectorize(linearPrime)
+    vectorizedSigmoid, vectorizedTanh, vectorizedLinear = np.vectorize(Activation.sigmoid), np.vectorize(Activation.tanh), np.vectorize(Activation.linear)
+    vectorizedSigmoidPrime, vectorizedTanhPrime, vectorizedLinearPrime = np.vectorize(Activation.sigmoidPrime), np.vectorize(Activation.tanhPrime), np.vectorize(Activation.linearPrime)
 
 
     for j in range(max_loops):
@@ -113,7 +121,7 @@ class NeuralNetwork():
         tripleLinearPrimeDelta = vectorizedLinearPrime(tripleLinearActivated)
         triplePrime = np.append(np.append(tripleSigmoidPrimeDelta, tripleTanhPrimeDelta), tripleLinearPrimeDelta)
          
-        delta1 = delta2.dot(weights1.T) * sigmoidPrime(output1)
+        delta1 = delta2.dot(weights1.T) * Activation.sigmoidPrime(output1)
         mixedDelta1 = mixedDelta2.dot(mixedWeights1.T) * prime
         tripleDelta1 = tripleDelta2.dot(tripleWeights1.T) * triplePrime
         
