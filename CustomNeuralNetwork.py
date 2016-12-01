@@ -268,6 +268,8 @@ class NeuralNetwork():
       plt.title(title + " errors vs. iteration")
 
   def predict(self, test_subject):
+    self.initialize_vectors()
+    
     tripleWeights = []
     for i in range(self.num_hidden_layers+1):
       tripleWeights.append(np.loadtxt('weights/tripleWeights{0}.txt'.format(i)))

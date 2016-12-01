@@ -69,7 +69,7 @@ def compare_knn(test_set=X_test):
 
 def test_sample():
 	test_subject = 50
-	nn, _, _ = get_neural_network(retrain=True)
+	nn, _, _ = get_neural_network(retrain=False)
 	n = nn.predict(X_test[test_subject])
 	k = predict_price(X_test[test_subject], nn)
 	print('Neural Net: {0}, {1}'.format(n, invertScale(n)))
@@ -107,6 +107,6 @@ def create_depth_graph(magic, errors, title):
 # price = predict_price(X_test[0], get_neural_network())
 # print(price)
 
-# test_sample()
-test_depths()
+test_sample()
+# test_depths()
 #compare_knn()
