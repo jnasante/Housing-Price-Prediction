@@ -62,7 +62,6 @@ class NeuralNetwork():
     if (self.num_hidden_layers < 1):
       return
 
-
     weights = [self.initialize_weight_layer(self.feature_count, self.hidden_layer_size)]
     for i in range(self.num_hidden_layers-1):
       weights.append(self.initialize_weight_layer(self.hidden_layer_size, self.hidden_layer_size))
@@ -186,7 +185,7 @@ class NeuralNetwork():
 
     ########################## WRITE TO FILE ##########################
     for w in range(len(weights)):
-      np.savetxt('tripleWeights{0}.txt'.format(w), weights[w])
+      np.savetxt('tripleWeights{0}_{1}.txt'.format(w, self.num_hidden_layers), weights[w])
 
     """
     testOutput1 = sigmoid(np.dot(X_test, weights0))
@@ -272,7 +271,7 @@ class NeuralNetwork():
     
     tripleWeights = []
     for i in range(self.num_hidden_layers+1):
-      tripleWeights.append(np.loadtxt('weights/tripleWeights{0}.txt'.format(i)))
+      tripleWeights.append(np.loadtxt('weights/tripleWeights{0}_5.txt'.format(i)))
 
     # Triple
     tripleOutput = []
@@ -281,8 +280,18 @@ class NeuralNetwork():
       tripleOutput.append(self.combine_arrays(self.activate_triple(np.dot(curr, tripleWeights[i]))))
       curr = tripleOutput[i]
     tripleOutput.append(self.vectorizedSigmoid(np.dot(curr, tripleWeights[-1])))
+    print(len(curr), len(tripleWeights[-1]))
 
 
+        #   tripleActivated.append(self.activate_triple(triple_output_dotted[l]))
+
+        #   triple_input_raw = np.append(np.append(tripleActivated[l][0], tripleActivated[l][1]), tripleActivated[l][2])
+
+        # # Output Layer (needs to be sigmoid activation)
+        # tripleOutput = self.vectorizedSigmoid(np.dot(triple_input_raw, tripleWeights[-1]))
+
+
+    # print(len(tripleOutput[-1]))
     return tripleOutput[-1]
 
   

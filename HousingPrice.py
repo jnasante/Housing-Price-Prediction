@@ -12,7 +12,7 @@ def get_neural_network(retrain=False, plot=True, hidden_layers=3):
 	nn = NeuralNetwork(feature_count=len(X[0]), num_hidden_layers=hidden_layers)
 	trainErrors, valErrors = None, None
 	if (retrain):
-		trainErrors, valErrors = nn.train_regression(X_train, y_train.T, X_val, y_val.T, X_test, y_test.T, max_loops=10, plot_results=plot)
+		trainErrors, valErrors = nn.train_regression(X_train, y_train.T, X_val, y_val.T, X_test, y_test.T, max_loops=150, plot_results=plot)
 
 	return nn, trainErrors, valErrors
 
@@ -80,11 +80,20 @@ def test_sample():
 
 def test_depths():
 	trainErrors, valErrors = [], []
-	for d in range(1, 10):
+	for d in range(1, 6):
 		print('Trying depth of {0}...'.format(d))
 		nn, te, ve = get_neural_network(retrain=True, plot=False, hidden_layers=d)
 		trainErrors.append(te)
 		valErrors.append(ve)
+
+	np.savetxt('trainErrors_depths.txt', trainErrors)
+	np.savetxt('valErrors_depths.txt', valErrors)
+
+def graph_depths():
+	trainErrors = np.loadtxt('trainErrors_depths.txt')
+	valErrors = np.loadtxt('valErrors_depths.txt')
+
+	print(len(valErrors), len(valErrors[0]))
 
 	create_depth_graph(211, trainErrors, 'Training')
 	create_depth_graph(212, valErrors, 'Validation')
@@ -96,7 +105,7 @@ def create_depth_graph(magic, errors, title):
 	legends = []
 	for i in range(len(errors)):
 		plt.plot(list(range(len(errors[i]))), errors[i])
-		legends.append(str(i+1))
+		legends.append('Number of hidden layers: {0}'.format(i+1))
 
 	plt.legend(legends)
 	plt.ylabel("SSE")
@@ -109,4 +118,5 @@ def create_depth_graph(magic, errors, title):
 
 test_sample()
 # test_depths()
+# graph_depths()
 #compare_knn()
