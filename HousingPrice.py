@@ -3,18 +3,19 @@ from CustomNeuralNetwork import NeuralNetwork
 from neural_network import TFNeuralNetwork
 import numpy as np
 from knn import get_neighbors
+from matplotlib import pyplot as plt
 
 # Prepare the data
 X_train, y_train, X_val, y_val, X_test, y_test = cross_validation()
 
-def get_custom_neural_network(retrain=False):
+def get_neural_network(retrain=False, plot=True, hidden_layers=3):
 	# Neural Network
-	nn = NeuralNetwork(feature_count=len(X[0]))
-	
+	nn = NeuralNetwork(feature_count=len(X[0]), num_hidden_layers=hidden_layers)
+	trainErrors, valErrors = None, None
 	if (retrain):
-		nn.train_regression(X_train, y_train.T, X_val, y_val.T, X_test, y_test.T, max_loops=1000, plot_results=True)
+		trainErrors, valErrors = nn.train_regression(X_train, y_train.T, X_val, y_val.T, X_test, y_test.T, max_loops=150, plot_results=plot)
 
-	return nn
+	return nn, trainErrors, valErrors
 
 def get_tf_neural_network(retrain=False):
 	nn = TFNeuralNetwork()
@@ -26,7 +27,7 @@ def get_tf_neural_network(retrain=False):
 
 def predict_price(test_subject, nn):
 	# K-Nearest Neighbors
-	neighbors = get_neighbors(X_test, test_subject, k=10)
+	neighbors = get_neighbors(X_test, test_subject, k=3)
 
 	# Combine forces
 	predictions_sum = 0.0
@@ -77,30 +78,56 @@ def compare_knn(test_set=X_test):
 
 def test_sample():
 	test_subject = 50
-	cnn = get_custom_neural_network(retrain=True)
-	tfnn = get_tf_neural_network(retrain=True)
+	nn, _, _ = get_neural_network(retrain=False)
+	n = nn.predict(X_test[test_subject])
+	k = predict_price(X_test[test_subject], nn)
+	print('Neural Net: {0}, {1}'.format(n, invertScale(n)))
+	print('KNN: {0}, {1}'.format(k[1], invertScale(k[1])))
+	print('Combined: {0}, {1}'.format(k[0], invertScale(k[0])))
+	print('Actual Price: {0}, {1}:'.format(y_test[test_subject], invertScale(y_test[test_subject])))
 
 	#cn = cnn.predict(X_test[test_subject])
 	#ck = predict_price(X_test[test_subject], cnn)
 
-	tfn = tfnn.predict(X_test[test_subject])
-	tfk = predict_price(X_test[test_subject], tfnn)
+def test_depths():
+	trainErrors, valErrors = [], []
+	for d in range(1, 6):
+		print('Trying depth of {0}...'.format(d))
+		nn, te, ve = get_neural_network(retrain=True, plot=False, hidden_layers=d)
+		trainErrors.append(te)
+		valErrors.append(ve)
 
-	"""
-	print('Custom Neural Net: {0}, {1}'.format(cn, invertScale(cn)))
-	print('Custom KNN: {0}, {1}'.format(ck[1], invertScale(ck[1])))
-	print('Custom Combined: {0}, {1}'.format(ck[0], invertScale(ck[0])))
-	print('Custom Actual Price: {0}, {1}:'.format(y_test[test_subject], invertScale(y_test[test_subject])))
-	"""
+	np.savetxt('trainErrors_depths.txt', trainErrors)
+	np.savetxt('valErrors_depths.txt', valErrors)
 
-	print('TF Neural Net: {0}, {1}'.format(tfn, invertScale(tfn)))
-	print('TF KNN: {0}, {1}'.format(tfk[1], invertScale(tfk[1])))
-	print('TF Combined: {0}, {1}'.format(tfk[0], invertScale(tfk[0])))
-	print('TF Actual Price: {0}, {1}:'.format(y_test[test_subject], invertScale(y_test[test_subject])))
+def graph_depths():
+	trainErrors = np.loadtxt('trainErrors_depths.txt')
+	valErrors = np.loadtxt('valErrors_depths.txt')
+
+	print(len(valErrors), len(valErrors[0]))
+
+	create_depth_graph(211, trainErrors, 'Training')
+	create_depth_graph(212, valErrors, 'Validation')
+
+	plt.show()
+
+def create_depth_graph(magic, errors, title):
+	plt.subplot(magic)
+	legends = []
+	for i in range(len(errors)):
+		plt.plot(list(range(len(errors[i]))), errors[i])
+		legends.append('Number of hidden layers: {0}'.format(i+1))
+
+	plt.legend(legends)
+	plt.ylabel("SSE")
+	plt.xlabel("Iterations")
+	plt.title(title + " errors vs. iteration")
 
 
 # price = predict_price(X_test[0], get_neural_network())
 # print(price)
 
 test_sample()
+# test_depths()
+# graph_depths()
 #compare_knn()
