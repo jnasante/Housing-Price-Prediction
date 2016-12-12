@@ -30,8 +30,9 @@ class Activation():
   def linearPrime(x):
     return 1
 
-def softplusPrime(x):
-  return sigmoid(x)
+  @staticmethod
+  def softplusPrime(x):
+    return sigmoid(x)
 
 def shuffle_lists(a, b):
   _a = []
@@ -284,15 +285,6 @@ class NeuralNetwork():
       curr = tripleOutput[i]
     tripleOutput.append(self.vectorizedSigmoid(np.dot(curr, tripleWeights[-1])))
     print(len(curr), len(tripleWeights[-1]))
-
-
-        #   tripleActivated.append(self.activate_triple(triple_output_dotted[l]))
-
-        #   triple_input_raw = np.append(np.append(tripleActivated[l][0], tripleActivated[l][1]), tripleActivated[l][2])
-
-        # # Output Layer (needs to be sigmoid activation)
-        # tripleOutput = self.vectorizedSigmoid(np.dot(triple_input_raw, tripleWeights[-1]))
-
 
     # print(len(tripleOutput[-1]))
     return tripleOutput[-1]
